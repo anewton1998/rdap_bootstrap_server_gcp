@@ -296,17 +296,16 @@ public class RedirectServlet extends HttpServlet
                     _s += _split[i];
                     if ( j % MIVAR == 0 )
                     {
-                        words[j / MIVAR - 1] = _s;// índice posicional
+                        words[j / MIVAR - 1] = _s;
                         _s = "";
                     }
                 }
 
                 for ( int i = 0; i < words.length - 1; i++ )
                 {// todos menos el
-                    // último
                     s += words[i] + DELIMITER;
                 }
-                s += words[words.length - 1];// el último sin DELIMITER
+                s += words[words.length - 1];
                 s += "/" + BITS_PER_WORD * n;
 
                 return ipV4Bootstrap.getServiceUrls( s );
