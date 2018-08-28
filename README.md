@@ -5,6 +5,8 @@ A bootstrap server aids clients by reading the bootstrapping information publish
 it to send HTTP redirects to RDAP queries. Clients utilizing a bootstrap server will not need to
 conduct their own bootstrapping.
 
+This is a fork of https://github.com/arineng/rdap_bootstrap_server to be adapted to for the Google Cloud Platform App Engine.
+
 ## Versioning, Building And Runtime Requirements
 
 Any version containing the word SNAPSHOT is a development version. Versions are:
@@ -23,8 +25,6 @@ data.
 * 1.1.1 - Bugfixes to /help and to parsing of IANA files
 * 1.2.0 - Added match_scheme_on_redirect option.
 * 1.2.1 - Fix to using IANA bootstrapping files according to current RFCs
-
-A pre-built version of is available [here](https://github.com/arinlabs/arin_rdap) for Vagrant users.
 
 This server is written as a Java servlet and should run in any Java Servlet 3.0 container or higher.
 It should build against Java 6 or higher.
