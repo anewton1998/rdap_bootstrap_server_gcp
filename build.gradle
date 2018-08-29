@@ -1,41 +1,73 @@
+buildscript {    // Configuration for building
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.cloud.tools:appengine-gradle-plugin:1.+'    // Latest 1.x.x release
+    }
+}
+
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots' // SNAPSHOT repository (if needed)
+    }
+    mavenCentral()
+    jcenter()
+}
+
 apply plugin: 'java'
 apply plugin: 'war'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
+apply plugin: 'com.google.cloud.tools.appengine' // App Engine tasks
 
 group = 'ARIN'
 version = '1000.0-SNAPSHOT'
-description = """RDAP Bootstrap Server"""
+description = """RDAP Bootstrap Server for GAE/J"""
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-repositories {
-     maven { url "http://repo.maven.apache.org/maven2" }
-}
-
 dependencies {
-    testCompile group: 'junit', name: 'junit', version:'4.8.2'
+    compile 'com.google.appengine:appengine-api-1.0-sdk:+'  // Latest App Engine Api's
+    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+
+    compile 'com.google.cloud:google-cloud:+'   // Latest Cloud API's http://googlecloudplatform.github.io/google-cloud-java
     compile group: 'com.googlecode.java-ipv6', name: 'java-ipv6', version:'0.13'
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.1.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.2.0'
-    compile 'com.google.appengine.tools:appengine-gcs-client:0.8'
+    compile group: 'net.ripe.ipresource', name: 'ipresource', version:'1.46'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.google.truth:truth:0.33'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+
+    testCompile 'com.google.appengine:appengine-testing:+'
+    testCompile 'com.google.appengine:appengine-api-stubs:+'
+    testCompile 'com.google.appengine:appengine-tools-sdk:+'
 }
 
-dependencies {
-	compile group: 'net.ripe.ipresource', name: 'ipresource', version:'1.46'
-}
+// Always run unit tests
+appengineDeploy.dependsOn test
+appengineStage.dependsOn test
 
-uploadArchives {
-    repositories.mavenDeployer {
-        if (project.version.endsWith('SNAPSHOT')) {
-            snapshotRepository(url: project.properties.mavenRepository) {
-                authentication(userName: project.properties.mavenUser, password: project.properties.mavenPassword)
-            }
-        } else {
-            repository(url: project.properties.mavenRepository) {
-                authentication(userName: project.properties.mavenUser, password: project.properties.mavenPassword)
-            }
-        }
+// [START model]
+appengine {  // App Engine tasks configuration
+    deploy {   // deploy configuration
+
     }
 }
+
+test {
+    useJUnit()
+    testLogging.showStandardStreams = true
+    beforeTest { descriptor ->
+        logger.lifecycle("test: " + descriptor + "  Running")
+    }
+
+    onOutput { descriptor, event ->
+        logger.lifecycle("test: " + descriptor + ": " + event.message )
+    }
+    afterTest { descriptor, result ->
+        logger.lifecycle("test: " + descriptor + ": " + result )
+    }
+}
+// [END model]
