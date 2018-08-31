@@ -39,7 +39,7 @@ public class RedirectServletTest
     public void testGetRedirectUrlDefault() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
@@ -56,7 +56,7 @@ public class RedirectServletTest
     public void testGetRedirectUrlDefaultOnlyHttp() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
@@ -72,7 +72,7 @@ public class RedirectServletTest
     public void testGetRedirectUrlDefaultOnlyHttps() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "https://example.com" );
@@ -88,8 +88,8 @@ public class RedirectServletTest
     public void testGetRedirectUrlFalse() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
             "False" );
 
         ServiceUrls urls = new ServiceUrls();
@@ -103,15 +103,15 @@ public class RedirectServletTest
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testGetRedirectUrlTrue() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
             "true" );
 
         ServiceUrls urls = new ServiceUrls();
@@ -125,15 +125,15 @@ public class RedirectServletTest
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testGetRedirectUrlTrueOnlyHttp() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
             "true" );
 
         ServiceUrls urls = new ServiceUrls();
@@ -146,15 +146,15 @@ public class RedirectServletTest
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testGetRedirectUrlTrueOnlyHttps() throws Exception
     {
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
             "true" );
 
         ServiceUrls urls = new ServiceUrls();
@@ -167,7 +167,7 @@ public class RedirectServletTest
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( Constants.PROPERTY_PREFIX + RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test

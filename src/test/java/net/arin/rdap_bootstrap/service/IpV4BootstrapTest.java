@@ -17,8 +17,12 @@
 package net.arin.rdap_bootstrap.service;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
+
+import java.io.InputStream;
 
 /**
  * @version $Rev$, $Date$
@@ -28,8 +32,11 @@ public class IpV4BootstrapTest
     @Test
     public void testAllocations() throws Exception
     {
+        InputStream inputStream = getClass().getResourceAsStream( "/ipv4.json" );
+        GcsResources mock = mock( GcsResources.class );
+        when( mock.getInputStream( GcsResources.BootFile.V4 ) ).thenReturn( inputStream );
         IpV4Bootstrap v4 = new IpV4Bootstrap();
-        v4.loadData( new ResourceFiles() );
+        v4.loadData( mock );
 
         assertEquals( "https://rdap.apnic.net", v4.getServiceUrls( "1" ).getHttpsUrl() );
         //TODO renable when their server are put back in the bootstrap files

@@ -20,7 +20,11 @@ import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6Network;
 import org.junit.Test;
 
+import java.io.InputStream;
+
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Rev$, $Date$
@@ -38,8 +42,11 @@ public class IpV6BootstrapTest
     @Test
     public void testAllocations() throws Exception
     {
+        InputStream inputStream = getClass().getResourceAsStream( "/ipv6.json" );
+        GcsResources mock = mock( GcsResources.class );
+        when( mock.getInputStream( GcsResources.BootFile.V6 ) ).thenReturn( inputStream );
         IpV6Bootstrap v6 = new IpV6Bootstrap();
-        v6.loadData( new ResourceFiles() );
+        v6.loadData( mock );
 
         assertEquals( ARIN, v6.getServiceUrls( IPv6Address.fromString( "2620:0000:0000:0000:0000:0000:0000:0000" ) ).getHttpUrl() );
         assertEquals( ARIN, v6.getServiceUrls( IPv6Address.fromString( "2620:0000:0000:0000:0000:0000:0000:ffff" ) ).getHttpUrl() );

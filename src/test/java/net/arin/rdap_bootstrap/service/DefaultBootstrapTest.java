@@ -19,7 +19,11 @@ package net.arin.rdap_bootstrap.service;
 import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
 import org.junit.Test;
 
+import java.io.InputStream;
+
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Rev$, $Date$
@@ -29,8 +33,11 @@ public class DefaultBootstrapTest
     @Test
     public void testAllocations() throws Exception
     {
+        InputStream dIS = getClass().getResourceAsStream( "/default.json" );
+        GcsResources mock = mock( GcsResources.class );
+        when( mock.getInputStream( GcsResources.BootFile.DEFAULT ) ).thenReturn( dIS );
         DefaultBootstrap d = new DefaultBootstrap();
-        d.loadData( new ResourceFiles() );
+        d.loadData( mock );
 
         assertEquals( "http://rdap.arin.net/registry",
             d.getServiceUrls( Type.AUTNUM ).getHttpUrl() );

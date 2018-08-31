@@ -18,7 +18,11 @@ package net.arin.rdap_bootstrap.service;
 
 import org.junit.Test;
 
+import java.io.InputStream;
+
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Rev$, $Date$
@@ -28,8 +32,11 @@ public class DomainBoostrapTest
     @Test
     public void testAllocations() throws Exception
     {
+        InputStream inputStream = getClass().getResourceAsStream( "/dns.json" );
+        GcsResources mock = mock( GcsResources.class );
+        when( mock.getInputStream( GcsResources.BootFile.DOMAIN ) ).thenReturn( inputStream );
         DomainBootstrap domain = new DomainBootstrap();
-        domain.loadData( new ResourceFiles() );
+        domain.loadData( mock );
 
         assertEquals( "http://rdg.afilias.info/rdap", domain.getServiceUrls( "foo.info" ).getHttpUrl() );
         assertEquals( "http://rdg.afilias.info/rdap", domain.getServiceUrls( "info" ).getHttpUrl() );

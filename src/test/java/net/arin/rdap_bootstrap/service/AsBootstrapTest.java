@@ -18,8 +18,12 @@ package net.arin.rdap_bootstrap.service;
 
 import org.junit.Test;
 
+import java.io.InputStream;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Rev$, $Date$
@@ -29,8 +33,11 @@ public class AsBootstrapTest
     @Test
     public void testBootstrap() throws Exception
     {
+        InputStream inputStream = getClass().getResourceAsStream( "/asn.json" );
+        GcsResources mock = mock( GcsResources.class );
+        when( mock.getInputStream( GcsResources.BootFile.AS ) ).thenReturn( inputStream );
         AsBootstrap asBootstrap = new AsBootstrap();
-        asBootstrap.loadData( new ResourceFiles() );
+        asBootstrap.loadData( mock );
 
         assertEquals( "http://rdap.arin.net/registry", asBootstrap.getServiceUrls( "1" ).getHttpUrl() );
         assertEquals( "http://rdap.arin.net/registry", asBootstrap.getServiceUrls( "2" ).getHttpUrl() );
