@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
-import net.arin.rdap_bootstrap.service.ResourceFiles.BootFiles;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.UniqueIpResource;
 
@@ -36,10 +35,10 @@ public class IpV4Bootstrap implements JsonBootstrapFile.Handler
     private String publication;
     private String description;
 
-    public void loadData( ResourceFiles resourceFiles ) throws Exception
+    public void loadData( GcsResources gcsResources )
     {
         JsonBootstrapFile bsFile = new JsonBootstrapFile();
-        bsFile.loadData( resourceFiles.getInputStream( BootFiles.V4.getKey() ), this );
+        bsFile.loadData( gcsResources.getInputStream( GcsResources.BootFile.V4 ), this );
     }
 
     @Override

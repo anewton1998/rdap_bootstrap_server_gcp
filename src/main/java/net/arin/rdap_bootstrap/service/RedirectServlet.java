@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletConfig;
@@ -33,12 +31,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.arin.rdap_bootstrap.Constants;
 import net.arin.rdap_bootstrap.json.Notice;
 import net.arin.rdap_bootstrap.json.Response;
 import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
-import net.arin.rdap_bootstrap.service.ResourceFiles.BootFiles;
 import net.arin.rdap_bootstrap.service.Statistics.UrlHits;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -62,12 +58,12 @@ public class RedirectServlet extends HttpServlet
 
     private volatile Statistics statistics;
 
-    private ResourceFiles resourceFiles;
+    private GcsResources gcsResources;
     private Timer timer;
     Boolean matchSchemeOnRedirect = Boolean.FALSE;
 
     private static final long CHECK_CONFIG_FILES = 60000L;
-    static final String MATCH_SCHEME_ON_REDIRECT = "match_scheme_on_redirect";
+    static final String MATCH_SCHEME_ON_REDIRECT = "rdap.match_scheme_on_redirect";
 
     @Override
     public void init( ServletConfig config ) throws ServletException
@@ -77,24 +73,10 @@ public class RedirectServlet extends HttpServlet
         statistics = new Statistics();
 
         matchSchemeOnRedirect = Boolean.valueOf( System
-            .getProperty( Constants.PROPERTY_PREFIX + MATCH_SCHEME_ON_REDIRECT,
+            .getProperty( MATCH_SCHEME_ON_REDIRECT,
                 matchSchemeOnRedirect.toString() ) );
 
-        try
-        {
-            LoadConfigTask loadConfigTask = new LoadConfigTask();
-            loadConfigTask.loadData();
-
-            if ( config != null )
-            {
-                timer = new Timer();
-                timer.schedule( loadConfigTask, CHECK_CONFIG_FILES, CHECK_CONFIG_FILES );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new ServletException( e );
-        }
+        loadData();
     }
 
     protected void serve( UrlHits urlHits, BaseMaker baseMaker, DefaultBootstrap.Type defaultType,
@@ -445,22 +427,16 @@ public class RedirectServlet extends HttpServlet
         // Modified dates for various bootstrap files, done this way so that
         // Publication dates can be published as well.
         notices.add( createPublicationDateNotice( "Default",
-            resourceFiles.getLastModified( BootFiles.DEFAULT.getKey() ),
             defaultBootstrap.getPublication() ) );
         notices.add( createPublicationDateNotice( "As",
-            resourceFiles.getLastModified( BootFiles.AS.getKey() ),
             asBootstrap.getPublication() ) );
         notices.add( createPublicationDateNotice( "Domain",
-            resourceFiles.getLastModified( BootFiles.DOMAIN.getKey() ),
             domainBootstrap.getPublication() ) );
         notices.add( createPublicationDateNotice( "Entity",
-            resourceFiles.getLastModified( BootFiles.ENTITY.getKey() ),
             entityBootstrap.getPublication() ) );
         notices.add( createPublicationDateNotice( "IpV4",
-            resourceFiles.getLastModified( BootFiles.V4.getKey() ),
             ipV4Bootstrap.getPublication() ) );
         notices.add( createPublicationDateNotice( "IpV6",
-            resourceFiles.getLastModified( BootFiles.V6.getKey() ),
             ipV6Bootstrap.getPublication() ) );
 
         response.setNotices( notices );
@@ -471,76 +447,32 @@ public class RedirectServlet extends HttpServlet
         writer.writeValue( outputStream, response );
     }
 
-    private Notice createPublicationDateNotice( String file, long lastModified,
+    private Notice createPublicationDateNotice( String file,
                                                 String publicationDate )
     {
         Notice bootFileModifiedNotice = new Notice();
 
         bootFileModifiedNotice
-            .setTitle( String.format( "%s Bootstrap File Modified and Published Dates", file ) );
-        String[] bootFileModifiedDescription = new String[2];
-        // Date format as 2015-05-15T17:04:06-0500 (Y-m-d'T'H:M:Sz)
-        bootFileModifiedDescription[0] = String.format( "%1$tFT%1$tT%1$tz", lastModified );
-        bootFileModifiedDescription[1] = publicationDate;
+            .setTitle( String.format( "%s Bootstrap File and Publication Date", file ) );
+        String[] bootFileModifiedDescription = new String[1];
+        bootFileModifiedDescription[0] = publicationDate;
         bootFileModifiedNotice.setDescription( bootFileModifiedDescription );
 
         return bootFileModifiedNotice;
     }
 
-    private class LoadConfigTask extends TimerTask
+    public void loadData()
     {
-        private boolean isModified( long currentTime, long lastModified )
+        if ( getServletConfig() != null )
         {
-            if ( ( currentTime - CHECK_CONFIG_FILES ) < lastModified )
-            {
-                return true;
-            }
-            // else
-            return false;
+            getServletContext().log( "Loading resource files." );
         }
-
-        @Override
-        public void run()
-        {
-            boolean load = false;
-            long currentTime = System.currentTimeMillis();
-            for ( BootFiles bootFiles : BootFiles.values() )
-            {
-                if ( isModified( currentTime,
-                    resourceFiles.getLastModified( bootFiles.getKey() ) ) )
-                {
-                    getServletContext().log( String
-                        .format( "%s was last modified at %s", bootFiles.getKey(),
-                            new Date( resourceFiles.getLastModified( bootFiles.getKey() ) ) ) );
-                    load = true;
-                }
-            }
-            if ( load )
-            {
-                try
-                {
-                    loadData();
-                }
-                catch ( Exception e )
-                {
-                    getServletContext().log( "Problem loading config", e );
-                }
-            }
-        }
-
-        public void loadData() throws Exception
-        {
-            if ( getServletConfig() != null )
-            {
-                getServletContext().log( "Loading resource files." );
-            }
-            resourceFiles = new ResourceFiles();
-            asBootstrap.loadData( resourceFiles );
-            ipV4Bootstrap.loadData( resourceFiles );
-            ipV6Bootstrap.loadData( resourceFiles );
-            domainBootstrap.loadData( resourceFiles );
-            entityBootstrap.loadData( resourceFiles );
-            defaultBootstrap.loadData( resourceFiles );
-        }
+        gcsResources = new GcsResources();
+        asBootstrap.loadData( gcsResources );
+        ipV4Bootstrap.loadData( gcsResources );
+        ipV6Bootstrap.loadData( gcsResources );
+        domainBootstrap.loadData( gcsResources );
+        entityBootstrap.loadData( gcsResources );
+        defaultBootstrap.loadData( gcsResources );
     }
 }

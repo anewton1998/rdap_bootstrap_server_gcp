@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
-import net.arin.rdap_bootstrap.service.ResourceFiles.BootFiles;
 
 import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6Network;
@@ -75,11 +74,10 @@ public class IpV6Bootstrap implements JsonBootstrapFile.Handler
         serviceUrls.addUrl( url );
     }
 
-    public void loadData( ResourceFiles resourceFiles )
-        throws Exception
+    public void loadData( GcsResources gcsResources )
     {
         JsonBootstrapFile bsFile = new JsonBootstrapFile();
-        bsFile.loadData( resourceFiles.getInputStream( BootFiles.V6.getKey() ), this );
+        bsFile.loadData( gcsResources.getInputStream( GcsResources.BootFile.V6 ), this );
     }
 
     public ServiceUrls getServiceUrls( long prefix )

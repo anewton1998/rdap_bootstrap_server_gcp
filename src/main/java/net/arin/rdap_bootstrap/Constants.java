@@ -20,5 +20,5 @@ package net.arin.rdap_bootstrap;
  */
 public class Constants
 {
-    public final static String PROPERTY_PREFIX = "arin.rdapbootstrap.";
+    public final static String BUCKET_NAME_PROPERTY = "rdap.bootfiles_bucket";
 }
