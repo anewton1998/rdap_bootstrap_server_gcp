@@ -18,9 +18,14 @@ package net.arin.rdap_bootstrap.service;
 
 import net.arin.rdap_bootstrap.Constants;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.InputStream;
+
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Rev$, $Date$
@@ -35,6 +40,25 @@ public class RedirectServletTest
     private static final String AFRINIC = "http://rdap.rd.me.afrinic.net/whois/AFRINIC";
     private static final String INFO = "http://rdg.afilias.info/rdap";
 
+
+    public GcsResources makeGcsResourceMock()
+    {
+        GcsResources mock = mock( GcsResources.class );
+        InputStream ipv6 = getClass().getResourceAsStream( "/ipv6.json" );
+        when( mock.getInputStream( GcsResources.BootFile.V6 ) ).thenReturn( ipv6 );
+        InputStream ipv4 = getClass().getResourceAsStream( "/ipv4.json" );
+        when( mock.getInputStream( GcsResources.BootFile.V4 ) ).thenReturn( ipv4 );
+        InputStream asn = getClass().getResourceAsStream( "/asn.json" );
+        when( mock.getInputStream( GcsResources.BootFile.AS ) ).thenReturn( asn );
+        InputStream dns = getClass().getResourceAsStream( "/dns.json" );
+        when( mock.getInputStream( GcsResources.BootFile.DOMAIN ) ).thenReturn( dns );
+        InputStream entity = getClass().getResourceAsStream( "/entity.json" );
+        when( mock.getInputStream( GcsResources.BootFile.ENTITY ) ).thenReturn( entity );
+        InputStream dIS = getClass().getResourceAsStream( "/default.json" );
+        when( mock.getInputStream( GcsResources.BootFile.DEFAULT ) ).thenReturn( dIS );
+        return mock;
+    }
+
     @Test
     public void testGetRedirectUrlDefault() throws Exception
     {
@@ -45,7 +69,7 @@ public class RedirectServletTest
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -61,7 +85,7 @@ public class RedirectServletTest
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -77,7 +101,7 @@ public class RedirectServletTest
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -96,7 +120,7 @@ public class RedirectServletTest
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -118,7 +142,7 @@ public class RedirectServletTest
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -139,7 +163,7 @@ public class RedirectServletTest
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -160,7 +184,7 @@ public class RedirectServletTest
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
@@ -173,7 +197,7 @@ public class RedirectServletTest
     @Test
     public void testMakeAutNumInt() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( ARIN, servlet.makeAutnumBase( "/autnum/10" ).getHttpUrl() );
@@ -185,7 +209,7 @@ public class RedirectServletTest
     @Test
     public void testMakeIpBase() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( ARIN, servlet.makeIpBase( "/ip/7.0.0.0/8" ).getHttpUrl() );
@@ -206,7 +230,7 @@ public class RedirectServletTest
     @Test
     public void testMakeDomainBase() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( INFO, servlet.makeDomainBase( "/domain/example.INFO" ).getHttpUrl() );
@@ -225,7 +249,7 @@ public class RedirectServletTest
     @Test
     public void testMakeNameserverBase() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( INFO,
@@ -237,7 +261,7 @@ public class RedirectServletTest
     @Test
     public void testMakeEntityBase() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet();
+        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
         servlet.init( null );
 
         assertEquals( ARIN, servlet.makeEntityBase( "/entity/ABC123-ARIN" ).getHttpUrl() );

@@ -59,11 +59,27 @@ public class RedirectServlet extends HttpServlet
     private volatile Statistics statistics;
 
     private GcsResources gcsResources;
-    private Timer timer;
     Boolean matchSchemeOnRedirect = Boolean.FALSE;
 
-    private static final long CHECK_CONFIG_FILES = 60000L;
     static final String MATCH_SCHEME_ON_REDIRECT = "rdap.match_scheme_on_redirect";
+
+    public RedirectServlet(GcsResources gcsResources)
+    {
+        this.gcsResources = gcsResources;
+    }
+
+    public RedirectServlet()
+    {
+    }
+
+    public GcsResources getGcsResources()
+    {
+        if( gcsResources == null )
+        {
+            gcsResources = new GcsResources();
+        }
+        return gcsResources;
+    }
 
     @Override
     public void init( ServletConfig config ) throws ServletException
@@ -467,7 +483,6 @@ public class RedirectServlet extends HttpServlet
         {
             getServletContext().log( "Loading resource files." );
         }
-        gcsResources = new GcsResources();
         asBootstrap.loadData( gcsResources );
         ipV4Bootstrap.loadData( gcsResources );
         ipV6Bootstrap.loadData( gcsResources );
