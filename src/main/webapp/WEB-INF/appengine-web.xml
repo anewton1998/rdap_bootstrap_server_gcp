@@ -22,5 +22,6 @@
         <property name="rdap.bootfiles_bucket" value="iana-bootstrap-files-for-rdap-experimentation"/>
         <property name="rdap.match_scheme_on_redirect" value="true"/>
     </system-properties>
+    <version>a1</version>
 </appengine-web-app>
         <!-- [END config] -->

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +48,7 @@ import com.googlecode.ipv6.IPv6Network;
 /**
  * @version $Rev$, $Date$
  */
+@WebServlet(name = "RDAP Bootstrap Server", urlPatterns = { "/help", "/domain/*", "/nameserver/*", "/ip/*", "/entity/*", "/autnum/*" } )
 public class RedirectServlet extends HttpServlet
 {
     private AsBootstrap asBootstrap = new AsBootstrap();
@@ -85,6 +87,10 @@ public class RedirectServlet extends HttpServlet
     public void init( ServletConfig config ) throws ServletException
     {
         super.init( config );
+        if( config != null )
+        {
+            config.getServletContext().log( "Starting bootstrap server" );
+        }
 
         statistics = new Statistics();
 
@@ -170,11 +176,11 @@ public class RedirectServlet extends HttpServlet
     {
         if( req == null )
         {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST );
+            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No valid request given." );
         }
         else if( req.getPathInfo() == null )
         {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST );
+            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No path information given." );
         }
         else
         {
@@ -207,7 +213,7 @@ public class RedirectServlet extends HttpServlet
             }
             else
             {
-                resp.sendError( HttpServletResponse.SC_NOT_FOUND );
+                resp.sendError( HttpServletResponse.SC_NOT_FOUND, "Unknown RDAP Query Type: " + pathInfo );
             }
         }
     }
@@ -483,11 +489,11 @@ public class RedirectServlet extends HttpServlet
         {
             getServletContext().log( "Loading resource files." );
         }
-        asBootstrap.loadData( gcsResources );
-        ipV4Bootstrap.loadData( gcsResources );
-        ipV6Bootstrap.loadData( gcsResources );
-        domainBootstrap.loadData( gcsResources );
-        entityBootstrap.loadData( gcsResources );
-        defaultBootstrap.loadData( gcsResources );
+        asBootstrap.loadData( getGcsResources() );
+        ipV4Bootstrap.loadData( getGcsResources() );
+        ipV6Bootstrap.loadData( getGcsResources() );
+        domainBootstrap.loadData( getGcsResources() );
+        entityBootstrap.loadData( getGcsResources() );
+        defaultBootstrap.loadData( getGcsResources() );
     }
 }
