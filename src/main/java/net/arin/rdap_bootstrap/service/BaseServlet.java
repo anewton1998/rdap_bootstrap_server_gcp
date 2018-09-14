@@ -43,10 +43,9 @@ import com.googlecode.ipv6.IPv6Network;
 @WebServlet(name = "RDAP Bootstrap Server", urlPatterns = { "/help", "/domain/*", "/nameserver/*", "/ip/*", "/entity/*", "/autnum/*" } )
 public class BaseServlet extends HttpServlet
 {
-    private GcsResources gcsResources;
-    Boolean matchSchemeOnRedirect = Boolean.FALSE;
+    protected Boolean matchSchemeOnRedirect = Boolean.FALSE;
 
-    static final String MATCH_SCHEME_ON_REDIRECT = "rdap.match_scheme_on_redirect";
+    protected static final String MATCH_SCHEME_ON_REDIRECT = "rdap.match_scheme_on_redirect";
 
     public BaseServlet()
     {
@@ -88,7 +87,7 @@ public class BaseServlet extends HttpServlet
         super.init( config );
         if( config != null )
         {
-            config.getServletContext().log( "Starting bootstrap server" );
+            config.getServletContext().log( "Starting " + this.getClass().getSimpleName() );
         }
 
         matchSchemeOnRedirect = Boolean.valueOf( System
@@ -124,7 +123,7 @@ public class BaseServlet extends HttpServlet
 
     }
 
-    String getRedirectUrl( String scheme, String pathInfo, ServiceUrls urls )
+    protected String getRedirectUrl( String scheme, String pathInfo, ServiceUrls urls )
     {
         String redirectUrl = null;
         if ( matchSchemeOnRedirect )
@@ -156,6 +155,23 @@ public class BaseServlet extends HttpServlet
         }
         return redirectUrl;
     }
+
+    protected boolean shouldService( HttpServletRequest req, HttpServletResponse resp ) throws IOException {
+        if( req == null )
+        {
+            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No valid request given." );
+            return false;
+        }
+        //else
+        if( req.getPathInfo() == null )
+        {
+            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No path information given." );
+            return false;
+        }
+        //else
+        return true;
+    }
+/*
 
     @Override
     protected void service( HttpServletRequest req, HttpServletResponse resp )
@@ -204,6 +220,7 @@ public class BaseServlet extends HttpServlet
             }
         }
     }
+*/
 
     public interface BaseMaker
     {
@@ -389,47 +406,5 @@ public class BaseServlet extends HttpServlet
             return null;
         }
 
-    }
-
-    public void makeHelp( OutputStream outputStream ) throws IOException
-    {
-        Response response = new Response( null );
-        ArrayList<Notice> notices = new ArrayList<Notice>();
-
-        // Modified dates for various bootstrap files, done this way so that
-        // Publication dates can be published as well.
-        notices.add( createPublicationDateNotice( "Default",
-            getDefaultBootstrap().getPublication() ) );
-        notices.add( createPublicationDateNotice( "As",
-            getAsBootstrap().getPublication() ) );
-        notices.add( createPublicationDateNotice( "Domain",
-            getDomainBootstrap().getPublication() ) );
-        notices.add( createPublicationDateNotice( "Entity",
-            getEntityBootstrap().getPublication() ) );
-        notices.add( createPublicationDateNotice( "IpV4",
-            getIpv4Bootstrap().getPublication() ) );
-        notices.add( createPublicationDateNotice( "IpV6",
-            getIpv6Bootstrap().getPublication() ) );
-
-        response.setNotices( notices );
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion( Include.NON_EMPTY );
-        ObjectWriter writer = mapper.writer( new DefaultPrettyPrinter() );
-        writer.writeValue( outputStream, response );
-    }
-
-    private Notice createPublicationDateNotice( String file,
-                                                String publicationDate )
-    {
-        Notice bootFileModifiedNotice = new Notice();
-
-        bootFileModifiedNotice
-            .setTitle( String.format( "%s Bootstrap File and Publication Date", file ) );
-        String[] bootFileModifiedDescription = new String[1];
-        bootFileModifiedDescription[0] = publicationDate;
-        bootFileModifiedNotice.setDescription( bootFileModifiedDescription );
-
-        return bootFileModifiedNotice;
     }
 }
