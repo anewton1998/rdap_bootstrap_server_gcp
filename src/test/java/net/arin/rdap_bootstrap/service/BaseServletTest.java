@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Rev$, $Date$
  */
-public class RedirectServletTest
+public class BaseServletTest
 {
     private static final String ARIN = "http://rdap.arin.net/registry";
     private static final String LACNIC = "https://rdap.lacnic.net/rdap";
@@ -87,9 +87,9 @@ public class RedirectServletTest
         return mock;
     }
 
-    private RedirectServlet makeRedirectServlet() throws Exception
+    private BaseServlet makeRedirectServlet() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet() {
+        BaseServlet servlet = new BaseServlet() {
             @Override
             public ServletContext getServletContext() {
                 return makeServletContext();
@@ -103,13 +103,13 @@ public class RedirectServletTest
     public void testGetRedirectUrlDefault() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
@@ -119,12 +119,12 @@ public class RedirectServletTest
     public void testGetRedirectUrlDefaultOnlyHttp() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
@@ -134,12 +134,12 @@ public class RedirectServletTest
     public void testGetRedirectUrlDefaultOnlyHttps() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
@@ -149,88 +149,88 @@ public class RedirectServletTest
     public void testGetRedirectUrlFalse() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT,
             "False" );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testGetRedirectUrlTrue() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT,
             "true" );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testGetRedirectUrlTrueOnlyHttp() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT,
             "true" );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "http://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "http://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testGetRedirectUrlTrueOnlyHttps() throws Exception
     {
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
-        System.setProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT,
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
+        System.setProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT,
             "true" );
 
         ServiceUrls urls = new ServiceUrls();
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );
 
         System
-            .clearProperty( RedirectServlet.MATCH_SCHEME_ON_REDIRECT );
+            .clearProperty( BaseServlet.MATCH_SCHEME_ON_REDIRECT );
     }
 
     @Test
     public void testMakeAutNumInt() throws Exception
     {
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( ARIN, servlet.makeAutnumBase( "/autnum/10" ).getHttpUrl() );
         //TODO re-enable when their servers are put back in the bootstrap files
@@ -241,7 +241,7 @@ public class RedirectServletTest
     @Test
     public void testMakeIpBase() throws Exception
     {
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( ARIN, servlet.makeIpBase( "/ip/7.0.0.0/8" ).getHttpUrl() );
         assertEquals( ARIN, servlet.makeIpBase( "/ip/7.0.0.0/16" ).getHttpUrl() );
@@ -261,7 +261,7 @@ public class RedirectServletTest
     @Test
     public void testMakeDomainBase() throws Exception
     {
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( INFO, servlet.makeDomainBase( "/domain/example.INFO" ).getHttpUrl() );
         assertEquals( INFO, servlet.makeDomainBase( "/domain/example.INFO." ).getHttpUrl() );
@@ -279,7 +279,7 @@ public class RedirectServletTest
     @Test
     public void testMakeNameserverBase() throws Exception
     {
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( INFO,
             servlet.makeNameserverBase( "/nameserver/ns1.example.INFO" ).getHttpUrl() );
@@ -290,7 +290,7 @@ public class RedirectServletTest
     @Test
     public void testMakeEntityBase() throws Exception
     {
-        RedirectServlet servlet = makeRedirectServlet();
+        BaseServlet servlet = makeRedirectServlet();
 
         assertEquals( ARIN, servlet.makeEntityBase( "/entity/ABC123-ARIN" ).getHttpUrl() );
         assertEquals( RIPE, servlet.makeEntityBase( "/entity/ABC123-RIPE" ).getHttpUrl() );

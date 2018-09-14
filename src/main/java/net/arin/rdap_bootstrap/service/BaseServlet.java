@@ -41,14 +41,14 @@ import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6Network;
 
 @WebServlet(name = "RDAP Bootstrap Server", urlPatterns = { "/help", "/domain/*", "/nameserver/*", "/ip/*", "/entity/*", "/autnum/*" } )
-public class RedirectServlet extends HttpServlet
+public class BaseServlet extends HttpServlet
 {
     private GcsResources gcsResources;
     Boolean matchSchemeOnRedirect = Boolean.FALSE;
 
     static final String MATCH_SCHEME_ON_REDIRECT = "rdap.match_scheme_on_redirect";
 
-    public RedirectServlet()
+    public BaseServlet()
     {
     }
 
