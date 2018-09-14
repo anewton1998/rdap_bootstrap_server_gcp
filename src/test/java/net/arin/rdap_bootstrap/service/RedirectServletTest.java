@@ -89,7 +89,7 @@ public class RedirectServletTest
 
     private RedirectServlet makeRedirectServlet() throws Exception
     {
-        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() ) {
+        RedirectServlet servlet = new RedirectServlet() {
             @Override
             public ServletContext getServletContext() {
                 return makeServletContext();
@@ -109,8 +109,7 @@ public class RedirectServletTest
         urls.addUrl( "http://example.com" );
         urls.addUrl( "https://example.com" );
 
-        RedirectServlet servlet = new RedirectServlet( makeGcsResourceMock() );
-        servlet.init( null );
+        RedirectServlet servlet = makeRedirectServlet();
 
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "http", "/bar", urls ) );
         assertEquals( "https://example.com/bar", servlet.getRedirectUrl( "https", "/bar", urls ) );

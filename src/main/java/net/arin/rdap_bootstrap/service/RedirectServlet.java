@@ -43,34 +43,43 @@ import com.googlecode.ipv6.IPv6Network;
 @WebServlet(name = "RDAP Bootstrap Server", urlPatterns = { "/help", "/domain/*", "/nameserver/*", "/ip/*", "/entity/*", "/autnum/*" } )
 public class RedirectServlet extends HttpServlet
 {
-    private AsBootstrap asBootstrap = new AsBootstrap();
-    private IpV6Bootstrap ipV6Bootstrap = new IpV6Bootstrap();
-    private IpV4Bootstrap ipV4Bootstrap = new IpV4Bootstrap();
-    private DomainBootstrap domainBootstrap = new DomainBootstrap();
-    private DefaultBootstrap defaultBootstrap = new DefaultBootstrap();
-    private EntityBootstrap entityBootstrap = new EntityBootstrap();
-
     private GcsResources gcsResources;
     Boolean matchSchemeOnRedirect = Boolean.FALSE;
 
     static final String MATCH_SCHEME_ON_REDIRECT = "rdap.match_scheme_on_redirect";
 
-    public RedirectServlet(GcsResources gcsResources)
-    {
-        this.gcsResources = gcsResources;
-    }
-
     public RedirectServlet()
     {
     }
 
-    public GcsResources getGcsResources()
+    protected DefaultBootstrap getDefaultBootstrap()
     {
-        if( gcsResources == null )
-        {
-            gcsResources = new GcsResources();
-        }
-        return gcsResources;
+        return (DefaultBootstrap) getServletContext().getAttribute( DefaultBootstrap.class.getName() );
+    }
+
+    protected AsBootstrap getAsBootstrap()
+    {
+        return (AsBootstrap) getServletContext().getAttribute( AsBootstrap.class.getName() );
+    }
+
+    protected IpV4Bootstrap getIpv4Bootstrap()
+    {
+        return (IpV4Bootstrap) getServletContext().getAttribute( IpV4Bootstrap.class.getName() );
+    }
+
+    protected IpV6Bootstrap getIpv6Bootstrap()
+    {
+        return (IpV6Bootstrap) getServletContext().getAttribute( IpV6Bootstrap.class.getName() );
+    }
+
+    protected DomainBootstrap getDomainBootstrap()
+    {
+        return (DomainBootstrap) getServletContext().getAttribute( DomainBootstrap.class.getName() );
+    }
+
+    protected EntityBootstrap getEntityBootstrap()
+    {
+        return (EntityBootstrap) getServletContext().getAttribute( EntityBootstrap.class.getName() );
     }
 
     @Override
@@ -85,8 +94,6 @@ public class RedirectServlet extends HttpServlet
         matchSchemeOnRedirect = Boolean.valueOf( System
             .getProperty( MATCH_SCHEME_ON_REDIRECT,
                 matchSchemeOnRedirect.toString() ) );
-
-        loadData();
     }
 
     protected void serve( BaseMaker baseMaker, DefaultBootstrap.Type defaultType,
@@ -98,7 +105,7 @@ public class RedirectServlet extends HttpServlet
             ServiceUrls urls = baseMaker.makeBase( pathInfo );
             if ( urls == null && defaultType != null )
             {
-                urls = defaultBootstrap.getServiceUrls( defaultType );
+                urls = getDefaultBootstrap().getServiceUrls( defaultType );
             }
             if ( urls == null )
             {
@@ -212,7 +219,7 @@ public class RedirectServlet extends HttpServlet
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            return asBootstrap.getServiceUrls( pathInfo.split( "/" )[2] );
+            return getAsBootstrap().getServiceUrls( pathInfo.split( "/" )[2] );
         }
     }
 
@@ -230,7 +237,7 @@ public class RedirectServlet extends HttpServlet
             if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
             {
                 // String firstOctet = pathInfo.split( "\\." )[ 0 ];
-                return ipV4Bootstrap.getServiceUrls( pathInfo );
+                return getIpv4Bootstrap().getServiceUrls( pathInfo );
             }
             // else
             IPv6Address addr = null;
@@ -243,7 +250,7 @@ public class RedirectServlet extends HttpServlet
                 IPv6Network net = IPv6Network.fromString( pathInfo );
                 addr = net.getFirst();
             }
-            return ipV6Bootstrap.getServiceUrls( addr );
+            return getIpv6Bootstrap().getServiceUrls( addr );
         }
     }
 
@@ -292,7 +299,7 @@ public class RedirectServlet extends HttpServlet
                 s += words[words.length - 1];
                 s += "/" + BITS_PER_WORD * n;
 
-                return ipV4Bootstrap.getServiceUrls( s );
+                return getIpv4Bootstrap().getServiceUrls( s );
 
             }
             else if ( pathInfo.endsWith( ".ip6.arpa" ) )
@@ -334,11 +341,11 @@ public class RedirectServlet extends HttpServlet
                         byteIdx++;
                     }
                 }
-                return ipV6Bootstrap.getServiceUrls( IPv6Address.fromByteArray( bytes ) );
+                return getIpv6Bootstrap().getServiceUrls( IPv6Address.fromByteArray( bytes ) );
             }
             // else
             String[] labels = pathInfo.split( "\\." );
-            return domainBootstrap.getServiceUrls( labels[labels.length - 1] );
+            return getDomainBootstrap().getServiceUrls( labels[labels.length - 1] );
         }
 
     }
@@ -360,7 +367,7 @@ public class RedirectServlet extends HttpServlet
                 pathInfo = pathInfo.substring( 0, pathInfo.length() - 1 );
             }
             String[] labels = pathInfo.split( "\\." );
-            return domainBootstrap.getServiceUrls( labels[labels.length - 1] );
+            return getDomainBootstrap().getServiceUrls( labels[labels.length - 1] );
         }
     }
 
@@ -376,7 +383,7 @@ public class RedirectServlet extends HttpServlet
             int i = pathInfo.lastIndexOf( '-' );
             if ( i != -1 && i + 1 < pathInfo.length() )
             {
-                return entityBootstrap.getServiceUrls( pathInfo.substring( i + 1 ) );
+                return getEntityBootstrap().getServiceUrls( pathInfo.substring( i + 1 ) );
             }
             // else
             return null;
@@ -392,17 +399,17 @@ public class RedirectServlet extends HttpServlet
         // Modified dates for various bootstrap files, done this way so that
         // Publication dates can be published as well.
         notices.add( createPublicationDateNotice( "Default",
-            defaultBootstrap.getPublication() ) );
+            getDefaultBootstrap().getPublication() ) );
         notices.add( createPublicationDateNotice( "As",
-            asBootstrap.getPublication() ) );
+            getAsBootstrap().getPublication() ) );
         notices.add( createPublicationDateNotice( "Domain",
-            domainBootstrap.getPublication() ) );
+            getDomainBootstrap().getPublication() ) );
         notices.add( createPublicationDateNotice( "Entity",
-            entityBootstrap.getPublication() ) );
+            getEntityBootstrap().getPublication() ) );
         notices.add( createPublicationDateNotice( "IpV4",
-            ipV4Bootstrap.getPublication() ) );
+            getIpv4Bootstrap().getPublication() ) );
         notices.add( createPublicationDateNotice( "IpV6",
-            ipV6Bootstrap.getPublication() ) );
+            getIpv6Bootstrap().getPublication() ) );
 
         response.setNotices( notices );
 
@@ -424,19 +431,5 @@ public class RedirectServlet extends HttpServlet
         bootFileModifiedNotice.setDescription( bootFileModifiedDescription );
 
         return bootFileModifiedNotice;
-    }
-
-    public void loadData()
-    {
-        if ( getServletConfig() != null )
-        {
-            getServletContext().log( "Loading resource files." );
-        }
-        asBootstrap.loadData( getGcsResources() );
-        ipV4Bootstrap.loadData( getGcsResources() );
-        ipV6Bootstrap.loadData( getGcsResources() );
-        domainBootstrap.loadData( getGcsResources() );
-        entityBootstrap.loadData( getGcsResources() );
-        defaultBootstrap.loadData( getGcsResources() );
     }
 }
