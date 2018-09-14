@@ -228,37 +228,6 @@ public class BaseServlet extends HttpServlet
         }
     }
 
-    public ServiceUrls makeIpBase( String pathInfo )
-    {
-        return new MakeIpBase().makeBase( pathInfo );
-    }
-
-    public class MakeIpBase implements BaseMaker
-    {
-        public ServiceUrls makeBase( String pathInfo )
-        {
-            // strip leading "/ip/"
-            pathInfo = pathInfo.substring( 4 );
-            if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
-            {
-                // String firstOctet = pathInfo.split( "\\." )[ 0 ];
-                return getIpv4Bootstrap().getServiceUrls( pathInfo );
-            }
-            // else
-            IPv6Address addr = null;
-            if ( pathInfo.indexOf( "/" ) == -1 )
-            {
-                addr = IPv6Address.fromString( pathInfo );
-            }
-            else
-            {
-                IPv6Network net = IPv6Network.fromString( pathInfo );
-                addr = net.getFirst();
-            }
-            return getIpv6Bootstrap().getServiceUrls( addr );
-        }
-    }
-
     public ServiceUrls makeNameserverBase( String pathInfo )
     {
         return new MakeNameserverBase().makeBase( pathInfo );
