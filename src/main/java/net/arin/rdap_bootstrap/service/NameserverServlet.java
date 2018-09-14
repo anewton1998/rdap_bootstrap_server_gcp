@@ -16,23 +16,19 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "RDAP IP", urlPatterns = { "/ip/*" }, loadOnStartup = 2 )
-public class IpServlet extends BaseServlet
+@WebServlet(name = "RDAP Nameserver", urlPatterns = { "/nameserver/*" } )
+public class NameserverServlet extends BaseServlet
 {
 
-    public IpServlet()
+    public NameserverServlet()
     {
     }
 
@@ -41,33 +37,24 @@ public class IpServlet extends BaseServlet
         if( shouldService( req, resp ) )
         {
             String pathInfo = req.getPathInfo();
-            serve( new MakeIpBase(), DefaultBootstrap.Type.IP, pathInfo, req, resp );
+            serve( new MakeNameserverBase(), DefaultBootstrap.Type.NAMESERVER, pathInfo, req, resp );
+
         }
     }
 
-    public class MakeIpBase implements BaseMaker
+    public class MakeNameserverBase implements BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            // strip leading "/ip/"
-            pathInfo = pathInfo.substring( 4 );
-            if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
+            // strip leading "/nameserver/"
+            pathInfo = pathInfo.substring( 12 );
+            // strip possible trailing period
+            if ( pathInfo.endsWith( "." ) )
             {
-                // String firstOctet = pathInfo.split( "\\." )[ 0 ];
-                return getIpv4Bootstrap().getServiceUrls( pathInfo );
+                pathInfo = pathInfo.substring( 0, pathInfo.length() - 1 );
             }
-            // else
-            IPv6Address addr = null;
-            if ( pathInfo.indexOf( "/" ) == -1 )
-            {
-                addr = IPv6Address.fromString( pathInfo );
-            }
-            else
-            {
-                IPv6Network net = IPv6Network.fromString( pathInfo );
-                addr = net.getFirst();
-            }
-            return getIpv6Bootstrap().getServiceUrls( addr );
+            String[] labels = pathInfo.split( "\\." );
+            return getDomainBootstrap().getServiceUrls( labels[labels.length - 1] );
         }
     }
 

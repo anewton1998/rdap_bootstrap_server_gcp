@@ -43,61 +43,6 @@ public class DomainServlet extends BaseServlet
         }
     }
 
-    /*
-    @Override
-    protected void service( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
-    {
-        if( req == null )
-        {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No valid request given." );
-        }
-        else if( req.getPathInfo() == null )
-        {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No path information given." );
-        }
-        else
-        {
-            String pathInfo = req.getPathInfo();
-            if ( pathInfo.startsWith( "/domain/" ) )
-            {
-                serve( new MakeDomainBase(), Type.DOMAIN, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/nameserver/" ) )
-            {
-                serve( new MakeNameserverBase(), Type.NAMESERVER, pathInfo, req,
-                    resp );
-            }
-            else if ( pathInfo.startsWith( "/ip/" ) )
-            {
-                serve( new MakeIpBase(), Type.IP, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/entity/" ) )
-            {
-                serve( new MakeEntityBase(), Type.ENTITY, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/autnum/" ) )
-            {
-                serve( new MakeAutnumBase(), Type.AUTNUM, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/help" ) )
-            {
-                resp.setContentType( "application/rdap+json" );
-                makeHelp( resp.getOutputStream() );
-            }
-            else
-            {
-                resp.sendError( HttpServletResponse.SC_NOT_FOUND, "Unknown RDAP Query Type: " + pathInfo );
-            }
-        }
-    }
-*/
-
-
-    public ServiceUrls makeDomainBase( String pathInfo )
-    {
-        return new MakeDomainBase().makeBase( pathInfo );
-    }
 
     public class MakeDomainBase implements BaseMaker
     {

@@ -215,40 +215,6 @@ public class BaseServlet extends HttpServlet
         public ServiceUrls makeBase( String pathInfo );
     }
 
-    public ServiceUrls makeAutnumBase( String pathInfo )
-    {
-        return new MakeAutnumBase().makeBase( pathInfo );
-    }
-
-    public class MakeAutnumBase implements BaseMaker
-    {
-        public ServiceUrls makeBase( String pathInfo )
-        {
-            return getAsBootstrap().getServiceUrls( pathInfo.split( "/" )[2] );
-        }
-    }
-
-    public ServiceUrls makeNameserverBase( String pathInfo )
-    {
-        return new MakeNameserverBase().makeBase( pathInfo );
-    }
-
-    public class MakeNameserverBase implements BaseMaker
-    {
-        public ServiceUrls makeBase( String pathInfo )
-        {
-            // strip leading "/nameserver/"
-            pathInfo = pathInfo.substring( 12 );
-            // strip possible trailing period
-            if ( pathInfo.endsWith( "." ) )
-            {
-                pathInfo = pathInfo.substring( 0, pathInfo.length() - 1 );
-            }
-            String[] labels = pathInfo.split( "\\." );
-            return getDomainBootstrap().getServiceUrls( labels[labels.length - 1] );
-        }
-    }
-
     public ServiceUrls makeEntityBase( String pathInfo )
     {
         return new MakeEntityBase().makeBase( pathInfo );

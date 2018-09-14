@@ -40,11 +40,6 @@ public class AutnumServlet extends BaseServlet
         }
     }
 
-    public ServiceUrls makeAutnumBase( String pathInfo )
-    {
-        return new MakeAutnumBase().makeBase( pathInfo );
-    }
-
     public class MakeAutnumBase implements BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo )
