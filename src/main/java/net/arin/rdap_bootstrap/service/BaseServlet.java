@@ -16,19 +16,15 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "RDAP Bootstrap Server", urlPatterns = { "/help", "/domain/*", "/nameserver/*", "/ip/*", "/entity/*", "/autnum/*" } )
 public class BaseServlet extends HttpServlet
 {
     protected Boolean matchSchemeOnRedirect = Boolean.FALSE;
@@ -159,79 +155,9 @@ public class BaseServlet extends HttpServlet
         //else
         return true;
     }
-/*
-
-    @Override
-    protected void service( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
-    {
-        if( req == null )
-        {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No valid request given." );
-        }
-        else if( req.getPathInfo() == null )
-        {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No path information given." );
-        }
-        else
-        {
-            String pathInfo = req.getPathInfo();
-            if ( pathInfo.startsWith( "/domain/" ) )
-            {
-                serve( new MakeDomainBase(), Type.DOMAIN, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/nameserver/" ) )
-            {
-                serve( new MakeNameserverBase(), Type.NAMESERVER, pathInfo, req,
-                    resp );
-            }
-            else if ( pathInfo.startsWith( "/ip/" ) )
-            {
-                serve( new MakeIpBase(), Type.IP, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/entity/" ) )
-            {
-                serve( new MakeEntityBase(), Type.ENTITY, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/autnum/" ) )
-            {
-                serve( new MakeAutnumBase(), Type.AUTNUM, pathInfo, req, resp );
-            }
-            else if ( pathInfo.startsWith( "/help" ) )
-            {
-                resp.setContentType( "application/rdap+json" );
-                makeHelp( resp.getOutputStream() );
-            }
-            else
-            {
-                resp.sendError( HttpServletResponse.SC_NOT_FOUND, "Unknown RDAP Query Type: " + pathInfo );
-            }
-        }
-    }
-*/
 
     public interface BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo );
-    }
-
-    public ServiceUrls makeEntityBase( String pathInfo )
-    {
-        return new MakeEntityBase().makeBase( pathInfo );
-    }
-
-    public class MakeEntityBase implements BaseMaker
-    {
-        public ServiceUrls makeBase( String pathInfo )
-        {
-            int i = pathInfo.lastIndexOf( '-' );
-            if ( i != -1 && i + 1 < pathInfo.length() )
-            {
-                return getEntityBootstrap().getServiceUrls( pathInfo.substring( i + 1 ) );
-            }
-            // else
-            return null;
-        }
-
     }
 }
