@@ -16,23 +16,18 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "RDAP IP", urlPatterns = { "/ip/*" }, loadOnStartup = 2 )
-public class IpServlet extends BaseServlet
+@WebServlet(name = "RDAP Autnum", urlPatterns = { "/autnum/*" }, loadOnStartup = 2 )
+public class AutnumServlet extends BaseServlet
 {
-
-    public IpServlet()
+    public AutnumServlet()
     {
     }
 
@@ -41,39 +36,20 @@ public class IpServlet extends BaseServlet
         if( shouldService( req, resp ) )
         {
             String pathInfo = req.getPathInfo();
-            serve( new MakeIpBase(), DefaultBootstrap.Type.IP, pathInfo, req, resp );
+            serve( new MakeAutnumBase(), DefaultBootstrap.Type.AUTNUM, pathInfo, req, resp );
         }
     }
 
-
-    public ServiceUrls makeIpBase( String pathInfo )
+    public ServiceUrls makeAutnumBase( String pathInfo )
     {
-        return new MakeIpBase().makeBase( pathInfo );
+        return new MakeAutnumBase().makeBase( pathInfo );
     }
 
-    public class MakeIpBase implements BaseMaker
+    public class MakeAutnumBase implements BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            // strip leading "/ip/"
-            pathInfo = pathInfo.substring( 4 );
-            if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
-            {
-                // String firstOctet = pathInfo.split( "\\." )[ 0 ];
-                return getIpv4Bootstrap().getServiceUrls( pathInfo );
-            }
-            // else
-            IPv6Address addr = null;
-            if ( pathInfo.indexOf( "/" ) == -1 )
-            {
-                addr = IPv6Address.fromString( pathInfo );
-            }
-            else
-            {
-                IPv6Network net = IPv6Network.fromString( pathInfo );
-                addr = net.getFirst();
-            }
-            return getIpv6Bootstrap().getServiceUrls( addr );
+            return getAsBootstrap().getServiceUrls( pathInfo.split( "/" )[2] );
         }
     }
 
