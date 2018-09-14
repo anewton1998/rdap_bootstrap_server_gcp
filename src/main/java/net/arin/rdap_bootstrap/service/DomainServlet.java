@@ -43,6 +43,10 @@ public class DomainServlet extends BaseServlet
         }
     }
 
+    public ServiceUrls makeDomainBase( String pathInfo )
+    {
+        return new MakeDomainBase().makeBase( pathInfo );
+    }
 
     public class MakeDomainBase implements BaseMaker
     {

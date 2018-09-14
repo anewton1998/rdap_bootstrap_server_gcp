@@ -45,6 +45,11 @@ public class IpServlet extends BaseServlet
         }
     }
 
+    public ServiceUrls makeIpBase( String pathInfo )
+    {
+        return new MakeIpBase().makeBase( pathInfo );
+    }
+
     public class MakeIpBase implements BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo )

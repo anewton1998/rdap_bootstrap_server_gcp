@@ -42,6 +42,11 @@ public class EntityServlet extends BaseServlet
         }
     }
 
+    public ServiceUrls makeEntityBase( String pathInfo )
+    {
+        return new MakeEntityBase().makeBase( pathInfo );
+    }
+
     public class MakeEntityBase implements BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo )

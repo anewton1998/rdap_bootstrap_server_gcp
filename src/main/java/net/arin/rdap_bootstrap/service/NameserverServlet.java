@@ -42,6 +42,11 @@ public class NameserverServlet extends BaseServlet
         }
     }
 
+    public ServiceUrls makeNameserverBase( String pathInfo )
+    {
+        return new MakeNameserverBase().makeBase( pathInfo );
+    }
+
     public class MakeNameserverBase implements BaseMaker
     {
         public ServiceUrls makeBase( String pathInfo )
