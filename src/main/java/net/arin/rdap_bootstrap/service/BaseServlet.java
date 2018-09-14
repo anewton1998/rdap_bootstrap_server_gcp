@@ -16,10 +16,9 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.googlecode.ipv6.IPv6Address;
+import com.googlecode.ipv6.IPv6Network;
+import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -27,18 +26,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.arin.rdap_bootstrap.json.Notice;
-import net.arin.rdap_bootstrap.json.Response;
-import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
-import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
+import java.io.IOException;
 
 @WebServlet(name = "RDAP Bootstrap Server", urlPatterns = { "/help", "/domain/*", "/nameserver/*", "/ip/*", "/entity/*", "/autnum/*" } )
 public class BaseServlet extends HttpServlet
@@ -269,102 +257,6 @@ public class BaseServlet extends HttpServlet
             }
             return getIpv6Bootstrap().getServiceUrls( addr );
         }
-    }
-
-    public ServiceUrls makeDomainBase( String pathInfo )
-    {
-        return new MakeDomainBase().makeBase( pathInfo );
-    }
-
-    public class MakeDomainBase implements BaseMaker
-    {
-        public ServiceUrls makeBase( String pathInfo )
-        {
-            // strip leading "/domain/"
-            pathInfo = pathInfo.substring( 8 );
-            // strip possible trailing period
-            if ( pathInfo.endsWith( "." ) )
-            {
-                pathInfo = pathInfo.substring( 0, pathInfo.length() - 1 );
-            }
-            if ( pathInfo.endsWith( ".in-addr.arpa" ) )
-            {
-                final int BITS_PER_WORD = 8, MIVAR = 1;
-                final String DELIMITER = ".";
-
-                String[] words = new String[4];
-                Arrays.fill( words, "0" );
-
-                final String[] _split = pathInfo.split( "\\." );
-                int n = _split.length - 2;
-
-                String s = "", _s = "";
-                for ( int i = n - 1, j = 1; i >= 0; i--, j++ )
-                {
-                    _s += _split[i];
-                    if ( j % MIVAR == 0 )
-                    {
-                        words[j / MIVAR - 1] = _s;
-                        _s = "";
-                    }
-                }
-
-                for ( int i = 0; i < words.length - 1; i++ )
-                {// todos menos el
-                    s += words[i] + DELIMITER;
-                }
-                s += words[words.length - 1];
-                s += "/" + BITS_PER_WORD * n;
-
-                return getIpv4Bootstrap().getServiceUrls( s );
-
-            }
-            else if ( pathInfo.endsWith( ".ip6.arpa" ) )
-            {
-                String[] labels = pathInfo.split( "\\." );
-                byte[] bytes = new byte[16];
-                Arrays.fill( bytes, ( byte ) 0 );
-                int labelIdx = labels.length - 3;
-                int byteIdx = 0;
-                int idxJump = 1;
-                while ( labelIdx > 0 )
-                {
-                    char ch = labels[labelIdx].charAt( 0 );
-                    byte value = 0;
-                    if ( ch >= '0' && ch <= '9' )
-                    {
-                        value = ( byte ) ( ch - '0' );
-                    }
-                    else if ( ch >= 'A' && ch <= 'F' )
-                    {
-                        value = ( byte ) ( ch - ( 'A' - 0xaL ) );
-                    }
-                    else if ( ch >= 'a' && ch <= 'f' )
-                    {
-                        value = ( byte ) ( ch - ( 'a' - 0xaL ) );
-                    }
-                    if ( idxJump % 2 == 1 )
-                    {
-                        bytes[byteIdx] = ( byte ) ( value << 4 );
-                    }
-                    else
-                    {
-                        bytes[byteIdx] = ( byte ) ( bytes[byteIdx] + value );
-                    }
-                    labelIdx--;
-                    idxJump++;
-                    if ( idxJump % 2 == 1 )
-                    {
-                        byteIdx++;
-                    }
-                }
-                return getIpv6Bootstrap().getServiceUrls( IPv6Address.fromByteArray( bytes ) );
-            }
-            // else
-            String[] labels = pathInfo.split( "\\." );
-            return getDomainBootstrap().getServiceUrls( labels[labels.length - 1] );
-        }
-
     }
 
     public ServiceUrls makeNameserverBase( String pathInfo )

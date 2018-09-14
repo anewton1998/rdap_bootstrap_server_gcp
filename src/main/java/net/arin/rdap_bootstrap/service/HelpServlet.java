@@ -20,23 +20,15 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
 import net.arin.rdap_bootstrap.json.Notice;
 import net.arin.rdap_bootstrap.json.Response;
-import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
-import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @WebServlet(name = "RDAP Help", urlPatterns = { "/help" } )
 public class HelpServlet extends BaseServlet
