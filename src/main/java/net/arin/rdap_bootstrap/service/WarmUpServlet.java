@@ -68,8 +68,5 @@ public class WarmUpServlet extends HttpServlet
         context.setAttribute( domainBootstrap.getClass().getName(), domainBootstrap );
         context.setAttribute( defaultBootstrap.getClass().getName(), defaultBootstrap );
         context.setAttribute( entityBootstrap.getClass().getName(), entityBootstrap );
-
-        Statistics statistics = new Statistics();
-        context.setAttribute( statistics.getClass().getName(), statistics );
     }
 }

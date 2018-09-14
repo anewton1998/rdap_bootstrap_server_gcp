@@ -20,10 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Timer;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -36,7 +32,6 @@ import net.arin.rdap_bootstrap.json.Notice;
 import net.arin.rdap_bootstrap.json.Response;
 import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
-import net.arin.rdap_bootstrap.service.Statistics.UrlHits;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -54,8 +49,6 @@ public class RedirectServlet extends HttpServlet
     private DomainBootstrap domainBootstrap = new DomainBootstrap();
     private DefaultBootstrap defaultBootstrap = new DefaultBootstrap();
     private EntityBootstrap entityBootstrap = new EntityBootstrap();
-
-    private volatile Statistics statistics;
 
     private GcsResources gcsResources;
     Boolean matchSchemeOnRedirect = Boolean.FALSE;
@@ -89,8 +82,6 @@ public class RedirectServlet extends HttpServlet
             config.getServletContext().log( "Starting bootstrap server" );
         }
 
-        statistics = new Statistics();
-
         matchSchemeOnRedirect = Boolean.valueOf( System
             .getProperty( MATCH_SCHEME_ON_REDIRECT,
                 matchSchemeOnRedirect.toString() ) );
@@ -98,32 +89,24 @@ public class RedirectServlet extends HttpServlet
         loadData();
     }
 
-    protected void serve( UrlHits urlHits, BaseMaker baseMaker, DefaultBootstrap.Type defaultType,
+    protected void serve( BaseMaker baseMaker, DefaultBootstrap.Type defaultType,
                           String pathInfo, HttpServletRequest req, HttpServletResponse resp )
         throws IOException
     {
         try
         {
-            UrlHits hits = urlHits;
             ServiceUrls urls = baseMaker.makeBase( pathInfo );
             if ( urls == null && defaultType != null )
             {
                 urls = defaultBootstrap.getServiceUrls( defaultType );
-                hits = UrlHits.DEFAULTHITS;
             }
             if ( urls == null )
             {
                 resp.sendError( HttpServletResponse.SC_NOT_FOUND );
-                statistics.getTotalMisses().incrementAndGet();
             }
             else
             {
                 String redirectUrl = getRedirectUrl( req.getScheme(), req.getPathInfo(), urls );
-                if ( hits != null )
-                {
-                    hits.hit( redirectUrl );
-                }
-                statistics.getTotalHits().incrementAndGet();
                 resp.sendRedirect( redirectUrl );
             }
         }
@@ -184,24 +167,24 @@ public class RedirectServlet extends HttpServlet
             String pathInfo = req.getPathInfo();
             if ( pathInfo.startsWith( "/domain/" ) )
             {
-                serve( UrlHits.DOMAINHITS, new MakeDomainBase(), Type.DOMAIN, pathInfo, req, resp );
+                serve( new MakeDomainBase(), Type.DOMAIN, pathInfo, req, resp );
             }
             else if ( pathInfo.startsWith( "/nameserver/" ) )
             {
-                serve( UrlHits.NAMESERVERHITS, new MakeNameserverBase(), Type.NAMESERVER, pathInfo, req,
+                serve( new MakeNameserverBase(), Type.NAMESERVER, pathInfo, req,
                     resp );
             }
             else if ( pathInfo.startsWith( "/ip/" ) )
             {
-                serve( UrlHits.IPHITS, new MakeIpBase(), Type.IP, pathInfo, req, resp );
+                serve( new MakeIpBase(), Type.IP, pathInfo, req, resp );
             }
             else if ( pathInfo.startsWith( "/entity/" ) )
             {
-                serve( UrlHits.ENTITYHITS, new MakeEntityBase(), Type.ENTITY, pathInfo, req, resp );
+                serve( new MakeEntityBase(), Type.ENTITY, pathInfo, req, resp );
             }
             else if ( pathInfo.startsWith( "/autnum/" ) )
             {
-                serve( UrlHits.ASHITS, new MakeAutnumBase(), Type.AUTNUM, pathInfo, req, resp );
+                serve( new MakeAutnumBase(), Type.AUTNUM, pathInfo, req, resp );
             }
             else if ( pathInfo.startsWith( "/help" ) )
             {
@@ -401,47 +384,10 @@ public class RedirectServlet extends HttpServlet
 
     }
 
-    private Notice makeStatsNotice( Statistics.UrlHits stats )
-    {
-        Notice notice = new Notice();
-        notice.setTitle( stats.getTitle() );
-        ArrayList<String> description = new ArrayList<String>();
-        Set<Entry<String, AtomicLong>> entrySet = stats.getEntrySet();
-        if ( entrySet.size() != 0 )
-        {
-            for ( Entry<String, AtomicLong> entry : entrySet )
-            {
-                description
-                    .add( String.format( "%-5d = %25s", entry.getValue().get(), entry.getKey() ) );
-            }
-        }
-        else
-        {
-            description.add( "Zero queries." );
-        }
-        notice.setDescription( description.toArray( new String[description.size()] ) );
-        return notice;
-    }
-
     public void makeHelp( OutputStream outputStream ) throws IOException
     {
         Response response = new Response( null );
         ArrayList<Notice> notices = new ArrayList<Notice>();
-
-        // do statistics
-        for ( Statistics.UrlHits stats : Statistics.UrlHits.values() )
-        {
-            notices.add( makeStatsNotice( stats ) );
-        }
-
-        // totals
-        Notice notice = new Notice();
-        notice.setTitle( "Totals" );
-        String[] description = new String[2];
-        description[0] = String.format( "Hits   = %5d", statistics.getTotalHits().get() );
-        description[1] = String.format( "Misses = %5d", statistics.getTotalMisses().get() );
-        notice.setDescription( description );
-        notices.add( notice );
 
         // Modified dates for various bootstrap files, done this way so that
         // Publication dates can be published as well.
