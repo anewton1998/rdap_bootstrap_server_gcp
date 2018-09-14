@@ -41,7 +41,12 @@ public class HelpServlet extends BaseServlet
     protected void service( HttpServletRequest req, HttpServletResponse resp )
         throws IOException
     {
-        if( shouldService( req, resp ) )
+
+        if( req == null )
+        {
+            resp.sendError( HttpServletResponse.SC_BAD_REQUEST, "No valid request given." );
+        }
+        else
         {
             resp.setContentType( "application/rdap+json" );
             makeHelp( resp.getOutputStream() );
@@ -82,7 +87,7 @@ public class HelpServlet extends BaseServlet
         Notice bootFileModifiedNotice = new Notice();
 
         bootFileModifiedNotice
-            .setTitle( String.format( "%s Bootstrap File and Publication Date", file ) );
+            .setTitle( String.format( "%s Bootstrap Publication Date", file ) );
         String[] bootFileModifiedDescription = new String[1];
         bootFileModifiedDescription[0] = publicationDate;
         bootFileModifiedNotice.setDescription( bootFileModifiedDescription );

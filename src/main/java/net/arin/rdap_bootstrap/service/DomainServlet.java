@@ -52,8 +52,8 @@ public class DomainServlet extends BaseServlet
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            // strip leading "/domain/"
-            pathInfo = pathInfo.substring( 8 );
+            // strip leading "/"
+            pathInfo = pathInfo.substring( 1 );
             // strip possible trailing period
             if ( pathInfo.endsWith( "." ) )
             {

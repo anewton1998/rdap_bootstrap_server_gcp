@@ -96,7 +96,7 @@ public class BaseServlet extends HttpServlet
             }
             else
             {
-                String redirectUrl = getRedirectUrl( req.getScheme(), req.getPathInfo(), urls );
+                String redirectUrl = getRedirectUrl( req.getScheme(), "/" + defaultType.getPValue() + pathInfo, urls );
                 resp.sendRedirect( redirectUrl );
             }
         }

@@ -49,7 +49,7 @@ public class AutnumServlet extends BaseServlet
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            return getAsBootstrap().getServiceUrls( pathInfo.split( "/" )[2] );
+            return getAsBootstrap().getServiceUrls( pathInfo.split( "/" )[1] );
         }
     }
 

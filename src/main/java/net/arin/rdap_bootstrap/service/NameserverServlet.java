@@ -51,8 +51,8 @@ public class NameserverServlet extends BaseServlet
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            // strip leading "/nameserver/"
-            pathInfo = pathInfo.substring( 12 );
+            // strip leading "/"
+            pathInfo = pathInfo.substring( 1 );
             // strip possible trailing period
             if ( pathInfo.endsWith( "." ) )
             {

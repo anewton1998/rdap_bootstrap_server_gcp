@@ -54,8 +54,8 @@ public class IpServlet extends BaseServlet
     {
         public ServiceUrls makeBase( String pathInfo )
         {
-            // strip leading "/ip/"
-            pathInfo = pathInfo.substring( 4 );
+            // strip leading "/"
+            pathInfo = pathInfo.substring( 1 );
             if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
             {
                 // String firstOctet = pathInfo.split( "\\." )[ 0 ];
