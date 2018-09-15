@@ -41,7 +41,7 @@ public class AutnumServletTest
     {
         AutnumServlet servlet = makeAutnumServlet();
 
-        assertEquals( TestUtils.ARIN, servlet.makeAutnumBase( "/autnum/10" ).getHttpUrl() );
+        assertEquals( TestUtils.ARIN, servlet.makeAutnumBase( "/10" ).getHttpUrl() );
         //TODO re-enable when their servers are put back in the bootstrap files
         //assertEquals( "http://rdap.db.ripe.net", asBootstrap.getServiceUrls( "7" ).getHttpUrl() );
         //assertEquals( RIPE, servlet.makeAutnumBase( "/autnum/42222" ).getHttpUrl() );

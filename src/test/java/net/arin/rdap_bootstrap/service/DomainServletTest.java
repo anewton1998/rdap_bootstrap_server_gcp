@@ -41,17 +41,17 @@ public class DomainServletTest
     {
         DomainServlet servlet = makeDomainServlet();
 
-        assertEquals( TestUtils.INFO, servlet.makeDomainBase( "/domain/example.INFO" ).getHttpUrl() );
-        assertEquals( TestUtils.INFO, servlet.makeDomainBase( "/domain/example.INFO." ).getHttpUrl() );
+        assertEquals( TestUtils.INFO, servlet.makeDomainBase( "/example.INFO" ).getHttpUrl() );
+        assertEquals( TestUtils.INFO, servlet.makeDomainBase( "/example.INFO." ).getHttpUrl() );
         assertEquals( TestUtils.ARIN,
-                servlet.makeDomainBase( "/domain/0.0.0.7.in-addr.arpa." ).getHttpUrl() );
-        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/domain/0.0.0.7.in-addr.arpa" ).getHttpUrl() );
-        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/domain/0.7.in-addr.arpa" ).getHttpUrl() );
-        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/domain/7.in-addr.arpa" ).getHttpUrl() );
-        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/domain/0.2.6.2.ip6.arpa" ).getHttpUrl() );
+                servlet.makeDomainBase( "/0.0.0.7.in-addr.arpa." ).getHttpUrl() );
+        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/0.0.0.7.in-addr.arpa" ).getHttpUrl() );
+        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/0.7.in-addr.arpa" ).getHttpUrl() );
+        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/7.in-addr.arpa" ).getHttpUrl() );
+        assertEquals( TestUtils.ARIN, servlet.makeDomainBase( "/0.2.6.2.ip6.arpa" ).getHttpUrl() );
         //TODO renable when their server are put back in the bootstrap files
-        //assertEquals( AFRINIC, servlet.makeDomainBase( "/domain/0.c.2.ip6.arpa" ).getHttpUrl() );
-        assertEquals( TestUtils.LACNIC, servlet.makeDomainBase( "/domain/0.0.8.2.ip6.arpa" ).getHttpsUrl() );
+        //assertEquals( AFRINIC, servlet.makeDomainBase( "/0.c.2.ip6.arpa" ).getHttpUrl() );
+        assertEquals( TestUtils.LACNIC, servlet.makeDomainBase( "/0.0.8.2.ip6.arpa" ).getHttpsUrl() );
     }
 
 
