@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  */
-package net.arin.rdap_bootstrap.service;
+package net.arin.rdap_bootstrap.performance;
 
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.etree.IntervalMap;
@@ -22,7 +22,11 @@ import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
 import net.ripe.ipresource.etree.NestedIntervalMap;
 import org.junit.Test;
 
+import java.util.Random;
+import java.util.stream.IntStream;
+
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 
 /**
@@ -92,6 +96,7 @@ public class IntervalMapTest
         assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.4.0.0/14" ) ), "net10" );
     }
 
+    @Test
     public void testNotFound()
     {
         IntervalMap<IpRange,String> map = new NestedIntervalMap<IpRange, String>( IpResourceIntervalStrategy.getInstance());
@@ -99,6 +104,39 @@ public class IntervalMapTest
         map.put( IpRange.parse( "10.0.0.0/8" ), "net10" );
 
         assertNull( map.findExactOrFirstLessSpecific( IpRange.parse( "20.0.0.0/8" ) ) );
+    }
+
+    @Test
+    public void testPerformance()
+    {
+        IntervalMap<IpRange,String> map = new NestedIntervalMap<IpRange, String>( IpResourceIntervalStrategy.getInstance());
+
+        map.put( IpRange.parse( "10.0.0.0/8" ), "net10" );
+        map.put( IpRange.parse( "10.0.0.0/16" ), "net10_0" );
+        map.put( IpRange.parse( "10.1.0.0/16" ), "net10_1" );
+        map.put( IpRange.parse( "10.2.0.0/16" ), "net10_2" );
+        map.put( IpRange.parse( "10.0.0.0/24" ), "net10_0_0" );
+        map.put( IpRange.parse( "10.0.1.0/24" ), "net10_0_1" );
+        map.put( IpRange.parse( "10.0.2.0/24" ), "net10_0_2" );
+        map.put( IpRange.parse( "10.1.0.0/24" ), "net10_1_0" );
+        map.put( IpRange.parse( "10.1.1.0/24" ), "net10_1_1" );
+        map.put( IpRange.parse( "10.1.2.0/24" ), "net10_1_2" );
+        map.put( IpRange.parse( "10.2.0.0/24" ), "net10_2_0" );
+        map.put( IpRange.parse( "10.2.1.0/24" ), "net10_2_1" );
+        map.put( IpRange.parse( "10.2.2.0/24" ), "net10_2_2" );
+
+        Random random = new Random();
+        IntStream.range(0, 1000000).forEach(
+                $ ->
+                    {
+                        int o2 = random.nextInt(255);
+                        int o3 = random.nextInt(255);
+                        int o4 = random.nextInt(255);
+                        String range = "10." + o2 + "." + o3 + "." + o4 + "/32";
+                        assertNotNull(map.findExactOrFirstLessSpecific(IpRange.parse(range)));
+                    }
+                );
+
     }
 
 }

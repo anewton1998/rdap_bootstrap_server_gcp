@@ -69,5 +69,24 @@ test {
     afterTest { descriptor, result ->
         logger.lifecycle("test: " + descriptor + ": " + result )
     }
+    exclude 'net/arin/rdap_bootstrap/performance/**'
+}
+
+task performanceTest( type: Test ) {
+    useJUnit()
+    testLogging.showStandardStreams = true
+    beforeTest { descriptor ->
+        logger.lifecycle("test: " + descriptor + "  Running")
+    }
+
+    onOutput { descriptor, event ->
+        logger.lifecycle("test: " + descriptor + ": " + event.message )
+    }
+    afterTest { descriptor, result ->
+        def totalTime = result.endTime - result.startTime
+        logger.lifecycle("test: " + descriptor + ": " + result + "   duration(millis): " + totalTime )
+    }
+    include 'net/arin/rdap_bootstrap/performance/**'
+    exclude 'net/arin/rdap_bootstrap/service/**'
 }
 // [END model]
