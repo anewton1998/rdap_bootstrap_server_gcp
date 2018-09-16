@@ -23,6 +23,7 @@ import net.ripe.ipresource.etree.NestedIntervalMap;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 
 /**
  * Tests {@link net.ripe.ipresource.etree.IntervalMap}.
@@ -51,6 +52,53 @@ public class IntervalMapTest
         assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.0.0.0/24" ) ), "net10" );
         assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "20.0.0.0/24" ) ), "net20" );
         assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "30.0.0.0/24" ) ), "net30" );
+    }
+
+    @Test
+    public void testNested()
+    {
+        IntervalMap<IpRange,String> map = new NestedIntervalMap<IpRange, String>( IpResourceIntervalStrategy.getInstance());
+
+        map.put( IpRange.parse( "10.0.0.0/8" ), "net10" );
+        map.put( IpRange.parse( "10.0.0.0/16" ), "net10_0" );
+        map.put( IpRange.parse( "10.1.0.0/16" ), "net10_1" );
+        map.put( IpRange.parse( "10.2.0.0/16" ), "net10_2" );
+        map.put( IpRange.parse( "10.0.0.0/24" ), "net10_0_0" );
+        map.put( IpRange.parse( "10.0.1.0/24" ), "net10_0_1" );
+        map.put( IpRange.parse( "10.0.2.0/24" ), "net10_0_2" );
+        map.put( IpRange.parse( "10.1.0.0/24" ), "net10_1_0" );
+        map.put( IpRange.parse( "10.1.1.0/24" ), "net10_1_1" );
+        map.put( IpRange.parse( "10.1.2.0/24" ), "net10_1_2" );
+        map.put( IpRange.parse( "10.2.0.0/24" ), "net10_2_0" );
+        map.put( IpRange.parse( "10.2.1.0/24" ), "net10_2_1" );
+        map.put( IpRange.parse( "10.2.2.0/24" ), "net10_2_2" );
+
+        // single IPs
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.0.0.2/32" ) ), "net10_0_0" );
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.1.0.2/32" ) ), "net10_1_0" );
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.2.2.2/32" ) ), "net10_2_2" );
+
+        // exact nets
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.0.0.0/24" ) ), "net10_0_0" );
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.1.1.0/24" ) ), "net10_1_1" );
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.2.1.0/24" ) ), "net10_2_1" );
+
+        // first less specific
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.0.0.0/26" ) ), "net10_0_0" );
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.1.0.0/22" ) ), "net10_1" );
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.3.1.0/24" ) ), "net10" );
+
+        // first less specific overlap
+        assertEquals( map.findExactOrFirstLessSpecific( IpRange.parse( "10.4.0.0/14" ) ), "net10" );
+    }
+
+    public void testNotFound()
+    {
+        IntervalMap<IpRange,String> map = new NestedIntervalMap<IpRange, String>( IpResourceIntervalStrategy.getInstance());
+
+        map.put( IpRange.parse( "10.0.0.0/8" ), "net10" );
+
+        assertNull( map.findExactOrFirstLessSpecific( IpRange.parse( "20.0.0.0/8" ) ) );
     }
 
 }
