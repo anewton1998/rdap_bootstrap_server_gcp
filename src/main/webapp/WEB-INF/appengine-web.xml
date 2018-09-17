@@ -23,5 +23,10 @@
         <property name="rdap.match_scheme_on_redirect" value="true"/>
     </system-properties>
     <version>a1</version>
+    <service>redirect</service>
+    <basic-scaling>
+        <max-instances>5</max-instances>
+    </basic-scaling>
+    <instance-class>B2</instance-class>
 </appengine-web-app>
         <!-- [END config] -->

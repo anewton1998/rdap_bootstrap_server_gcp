@@ -21,6 +21,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @WebServlet(name = "_ah_warmup", value = "/_ah/warmup", loadOnStartup = 1 )
 public class WarmUpServlet extends HttpServlet
@@ -70,5 +72,14 @@ public class WarmUpServlet extends HttpServlet
         context.setAttribute( entityBootstrap.getClass().getName(), entityBootstrap );
 
         context.log( "Resource files loaded." );
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                context.log( "Timed task" );
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule( task, 1000L, 1000L );
     }
 }
