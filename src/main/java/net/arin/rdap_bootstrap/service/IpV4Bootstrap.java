@@ -21,15 +21,19 @@ import java.util.Set;
 
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.Ipv4Address;
 import net.ripe.ipresource.UniqueIpResource;
+import net.ripe.ipresource.etree.IntervalMap;
+import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
+import net.ripe.ipresource.etree.NestedIntervalMap;
 
 /**
  * @version $Rev$, $Date$
  */
 public class IpV4Bootstrap implements JsonBootstrapFile.Handler
 {
-    private volatile HashMap<String, ServiceUrls> allocations = new HashMap<String, ServiceUrls>();
-    private HashMap<String, ServiceUrls> _allocations;
+    private volatile IntervalMap<IpRange,ServiceUrls> allocations = new NestedIntervalMap<>( IpResourceIntervalStrategy.getInstance() );
+    private IntervalMap<IpRange,ServiceUrls> _allocations;
 
     private ServiceUrls serviceUrls;
     private String publication;
@@ -44,7 +48,7 @@ public class IpV4Bootstrap implements JsonBootstrapFile.Handler
     @Override
     public void startServices()
     {
-        _allocations = new HashMap<String, ServiceUrls>();
+        _allocations = new NestedIntervalMap<>( IpResourceIntervalStrategy.getInstance() );
     }
 
     @Override
@@ -68,7 +72,7 @@ public class IpV4Bootstrap implements JsonBootstrapFile.Handler
     @Override
     public void addServiceEntry( String entry )
     {
-        _allocations.put( entry, serviceUrls );
+        _allocations.put( IpRange.parse( entry ), serviceUrls );
     }
 
     @Override
@@ -77,50 +81,14 @@ public class IpV4Bootstrap implements JsonBootstrapFile.Handler
         serviceUrls.addUrl( url );
     }
 
-    public ServiceUrls getServiceUrls( String prefix )
+    public ServiceUrls getServiceUrls( IpRange ipRange )
     {
+        return allocations.findExactOrFirstLessSpecific( ipRange );
+    }
 
-        UniqueIpResource start;
-
-        if ( !prefix.contains( "/" ) && prefix.contains( "." ) )
-        {
-            // single host
-            start = UniqueIpResource.parse( prefix );
-        }
-        else if ( !prefix.contains( "/" ) )
-        {
-            // /8 single int behaviour
-            try
-            {
-                new Integer( prefix );
-                start = IpRange.parse( prefix + ".0.0.0/8" ).getStart();
-            }
-            catch ( NumberFormatException e )
-            {
-                // network
-                start = IpRange.parse( prefix ).getStart();
-            }
-        }
-        else
-        {
-            // network
-            start = IpRange.parse( prefix ).getStart();
-        }
-
-        ServiceUrls resultUrl = null;
-        IpRange resultNetwork = IpRange.parse( "0.0.0.0/0" );
-        final Set<String> keys = allocations.keySet();
-        for ( String key : keys )
-        {
-            final IpRange network = IpRange.parse( key );
-            if ( network.contains( start ) && ( resultNetwork.getPrefixLength() < network
-                .getPrefixLength() ) )
-            {
-                resultNetwork = network;
-                resultUrl = allocations.get( key );
-            }
-        }
-        return resultUrl;
+    public ServiceUrls getServiceUrls( Ipv4Address ipv4Address )
+    {
+        return allocations.findExactOrFirstLessSpecific( IpRange.range( ipv4Address, ipv4Address ) );
     }
 
     @Override

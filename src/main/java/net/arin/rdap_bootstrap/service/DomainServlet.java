@@ -16,9 +16,9 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import com.googlecode.ipv6.IPv6Address;
 import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
+import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.Ipv6Address;
 
 import javax.servlet.ServletException;
@@ -90,7 +90,7 @@ public class DomainServlet extends BaseServlet
                 s += words[words.length - 1];
                 s += "/" + BITS_PER_WORD * n;
 
-                return getIpv4Bootstrap().getServiceUrls( s );
+                return getIpv4Bootstrap().getServiceUrls( IpRange.parse( s ) );
 
             }
             else if ( pathInfo.endsWith( ".ip6.arpa" ) )

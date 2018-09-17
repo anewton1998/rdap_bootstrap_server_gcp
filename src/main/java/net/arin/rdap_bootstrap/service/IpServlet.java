@@ -18,6 +18,7 @@ package net.arin.rdap_bootstrap.service;
 
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.Ipv4Address;
 import net.ripe.ipresource.Ipv6Address;
 
 import javax.servlet.ServletException;
@@ -56,7 +57,12 @@ public class IpServlet extends BaseServlet
             pathInfo = pathInfo.substring( 1 );
             if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
             {
-                return getIpv4Bootstrap().getServiceUrls( pathInfo );
+                if( pathInfo.indexOf( "/" ) == -1 )
+                {
+                    return getIpv4Bootstrap().getServiceUrls( Ipv4Address.parse( pathInfo ) );
+                }
+                //else
+                return getIpv4Bootstrap().getServiceUrls( IpRange.parse( pathInfo ) );
             }
             // else
             if ( pathInfo.indexOf( "/" ) == -1 )
