@@ -19,12 +19,14 @@ package net.arin.rdap_bootstrap.service;
 import com.googlecode.ipv6.IPv6Address;
 import net.arin.rdap_bootstrap.service.DefaultBootstrap.Type;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
+import net.ripe.ipresource.Ipv6Address;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 @WebServlet(name = "RDAP Domain", urlPatterns = { "/domain/*" }, loadOnStartup = 2 )
@@ -130,7 +132,8 @@ public class DomainServlet extends BaseServlet
                         byteIdx++;
                     }
                 }
-                return getIpv6Bootstrap().getServiceUrls( IPv6Address.fromByteArray( bytes ) );
+                BigInteger bigInt = new BigInteger( 1, bytes );
+                return getIpv6Bootstrap().getServiceUrls( new Ipv6Address( bigInt ) );
             }
             // else
             String[] labels = pathInfo.split( "\\." );

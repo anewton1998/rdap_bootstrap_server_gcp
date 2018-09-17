@@ -16,9 +16,9 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
+import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.Ipv6Address;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -59,17 +59,12 @@ public class IpServlet extends BaseServlet
                 return getIpv4Bootstrap().getServiceUrls( pathInfo );
             }
             // else
-            IPv6Address addr = null;
             if ( pathInfo.indexOf( "/" ) == -1 )
             {
-                addr = IPv6Address.fromString( pathInfo );
+                return getIpv6Bootstrap().getServiceUrls( Ipv6Address.parse( pathInfo ) );
             }
-            else
-            {
-                IPv6Network net = IPv6Network.fromString( pathInfo );
-                addr = net.getFirst();
-            }
-            return getIpv6Bootstrap().getServiceUrls( addr );
+            //else
+            return getIpv6Bootstrap().getServiceUrls( IpRange.parse( pathInfo ) );
         }
     }
 

@@ -16,21 +16,20 @@
  */
 package net.arin.rdap_bootstrap.service;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
-
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6Network;
+import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.Ipv6Address;
+import net.ripe.ipresource.etree.IntervalMap;
+import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
+import net.ripe.ipresource.etree.NestedIntervalMap;
 
 /**
  * @version $Rev$, $Date$
  */
 public class IpV6Bootstrap implements JsonBootstrapFile.Handler
 {
-    private volatile TreeMap<Long, ServiceUrls> allocations = new TreeMap<Long, ServiceUrls>();
-    private TreeMap<Long, ServiceUrls> _allocations;
+    private volatile IntervalMap<IpRange,ServiceUrls> allocations = new NestedIntervalMap<>( IpResourceIntervalStrategy.getInstance() );
+    private IntervalMap<IpRange,ServiceUrls> _allocations;
 
     private ServiceUrls serviceUrls;
     private String publication;
@@ -39,7 +38,7 @@ public class IpV6Bootstrap implements JsonBootstrapFile.Handler
     @Override
     public void startServices()
     {
-        _allocations = new TreeMap<Long, ServiceUrls>();
+        _allocations = new NestedIntervalMap<>( IpResourceIntervalStrategy.getInstance() ) ;
     }
 
     @Override
@@ -63,9 +62,7 @@ public class IpV6Bootstrap implements JsonBootstrapFile.Handler
     @Override
     public void addServiceEntry( String entry )
     {
-        IPv6Network v6net = IPv6Network.fromString( entry );
-        long key = v6net.getFirst().getHighBits();
-        _allocations.put( key, serviceUrls );
+        _allocations.put( IpRange.parse( entry ), serviceUrls );
     }
 
     @Override
@@ -80,25 +77,14 @@ public class IpV6Bootstrap implements JsonBootstrapFile.Handler
         bsFile.loadData( gcsResources.getInputStream( GcsResources.BootFile.V6 ), this );
     }
 
-    public ServiceUrls getServiceUrls( long prefix )
+    public ServiceUrls getServiceUrls( IpRange ipRange )
     {
-        ServiceUrls retval = null;
-        Map.Entry<Long, ServiceUrls> entry = allocations.floorEntry( prefix );
-        if ( entry != null )
-        {
-            retval = entry.getValue();
-        }
-        return retval;
+        return allocations.findExactOrFirstLessSpecific( ipRange );
     }
 
-    public ServiceUrls getServiceUrls( IPv6Address addr )
+    public ServiceUrls getServiceUrls( Ipv6Address ipv6Address )
     {
-        return getServiceUrls( addr.getHighBits() );
-    }
-
-    public ServiceUrls getServiceUrls( IPv6Network net )
-    {
-        return getServiceUrls( net.getFirst().getHighBits() );
+        return allocations.findExactOrFirstLessSpecific( IpRange.range( ipv6Address, ipv6Address) );
     }
 
     @Override
