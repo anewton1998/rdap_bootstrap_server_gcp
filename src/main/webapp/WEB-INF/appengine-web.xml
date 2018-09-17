@@ -24,9 +24,9 @@
     </system-properties>
     <version>a1</version>
     <service>redirect</service>
-    <basic-scaling>
-        <max-instances>5</max-instances>
-    </basic-scaling>
     <instance-class>F2</instance-class>
+    <automatic-scaling>
+        <max-concurrent-requests>20</max-concurrent-requests>
+    </automatic-scaling>
 </appengine-web-app>
         <!-- [END config] -->
