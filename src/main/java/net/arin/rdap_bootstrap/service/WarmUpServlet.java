@@ -80,6 +80,6 @@ public class WarmUpServlet extends HttpServlet
             }
         };
         Timer timer = new Timer();
-        timer.schedule( task, 1000L, 1000L );
+        timer.schedule( task, 10000L, 10000L );
     }
 }
