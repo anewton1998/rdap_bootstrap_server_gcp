@@ -20,10 +20,8 @@ import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6Network;
 import net.arin.rdap_bootstrap.service.JsonBootstrapFile.ServiceUrls;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -58,7 +56,6 @@ public class IpServlet extends BaseServlet
             pathInfo = pathInfo.substring( 1 );
             if ( pathInfo.indexOf( ":" ) == -1 ) // is not ipv6
             {
-                // String firstOctet = pathInfo.split( "\\." )[ 0 ];
                 return getIpv4Bootstrap().getServiceUrls( pathInfo );
             }
             // else
