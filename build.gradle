@@ -36,7 +36,7 @@ dependencies {
     compile group: 'net.ripe.ipresource', name: 'ipresource', version:'1.46'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'com.google.truth:truth:0.33'
+    testCompile 'com.google.truth:truth:1.0'
     testCompile "org.mockito:mockito-core:2.+"
 
     testCompile 'com.google.appengine:appengine-testing:+'
