@@ -32,7 +32,7 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
     compile 'com.google.cloud:google-cloud:+'   // Latest Cloud API's http://googlecloudplatform.github.io/google-cloud-java
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.2.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.11.3'
     compile group: 'net.ripe.ipresource', name: 'ipresource', version:'1.46'
 
     testCompile 'junit:junit:4.12'
