@@ -4,7 +4,7 @@ buildscript {    // Configuration for building
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.cloud.tools:appengine-gradle-plugin:1.+'    // Latest 1.x.x release
+        classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.+'    // Latest 1.x.x release
     }
 }
 
